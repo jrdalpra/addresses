@@ -30,5 +30,6 @@
 
 	<modules>
 		<module>model</module>
+		<module>api</module>
 	</modules>
 </project>

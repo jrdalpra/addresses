@@ -9,12 +9,12 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class Neighborhood implements Serializable {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	private Long id;
+    private Long              id;
 
-	private String name;
+    private String            name;
 
-	private Locale locale;
+    private Locale            locale;
 
 }

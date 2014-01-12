@@ -17,7 +17,7 @@ import com.zeroturnaround.rebellabs.addresses.model.Country;
 
 @Controller
 @ExposesResourceFor(Country.class)
-@RequestMapping("/contries")
+@RequestMapping("/countries")
 public class CountriesController {
 
     @Inject

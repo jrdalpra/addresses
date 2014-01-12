@@ -1,4 +1,4 @@
-package addresses.api;
+package com.zeroturnaround.rebellabs.addresses.api;
 
 import java.util.List;
 

@@ -6,6 +6,14 @@
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
+	<properties>
+		<version.java>1.7</version.java>
+		<version.spring>4.0.0.RELEASE</version.spring>
+		<version.lombok>1.12.2</version.lombok>
+		<version.spring-hateoas>0.8.0.RELEASE</version.spring-hateoas>
+		<version.spring-webmvc>4.0.0.RELEASE</version.spring-webmvc>
+	</properties>
+
 	<build>
 		<plugins>
 			<plugin>
@@ -13,18 +21,75 @@
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>3.1</version>
 				<configuration>
-					<source>1.7</source>
-					<target>1.7</target>
+					<source>${version.java}</source>
+					<target>${version.java}</target>
 				</configuration>
 			</plugin>
 		</plugins>
 	</build>
 
+	<repositories>
+		<repository>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+			<id>central</id>
+			<name>libs-release-remote</name>
+			<url>http://repo.spring.io/libs-release-remote</url>
+		</repository>
+		<repository>
+			<snapshots />
+			<id>snapshots</id>
+			<name>libs-snapshot-remote</name>
+			<url>http://repo.spring.io/libs-snapshot-remote</url>
+		</repository>
+		<repository>
+			<id>spring-libs-snapshot</id>
+			<url>http://repo.springsource.org/libs-snapshot</url>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+		</repository>
+	</repositories>
+	<pluginRepositories>
+		<pluginRepository>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+			<id>central</id>
+			<name>plugins-release</name>
+			<url>http://repo.spring.io/plugins-release</url>
+		</pluginRepository>
+		<pluginRepository>
+			<snapshots />
+			<id>snapshots</id>
+			<name>plugins-snapshot</name>
+			<url>http://repo.spring.io/plugins-snapshot</url>
+		</pluginRepository>
+		<pluginRepository>
+			<id>spring-libs-snapshot</id>
+			<url>http://repo.springsource.org/libs-snapshot</url>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+		</pluginRepository>
+	</pluginRepositories>
+
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>javax.inject</groupId>
+				<artifactId>javax.inject</artifactId>
+				<version>1</version>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
 	<dependencies>
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
-			<version>1.12.2</version>
+			<version>${version.lombok}</version>
 		</dependency>
 	</dependencies>
 
@@ -35,5 +100,6 @@
 		<module>vraptor</module>
 		<module>impl</module>
 		<module>jaxrs</module>
+		<module>api-inmemoryimpl</module>
 	</modules>
 </project>

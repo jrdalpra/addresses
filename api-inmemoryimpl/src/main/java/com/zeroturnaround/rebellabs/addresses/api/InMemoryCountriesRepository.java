@@ -36,4 +36,9 @@ public class InMemoryCountriesRepository implements CountriesRepository {
         return countries;
     }
 
+    @Override
+    public Integer lastPage(int max) {
+        return 10;
+    }
+
 }

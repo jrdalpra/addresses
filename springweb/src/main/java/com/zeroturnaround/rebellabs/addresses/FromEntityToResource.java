@@ -1,28 +1,24 @@
 package com.zeroturnaround.rebellabs.addresses;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import lombok.RequiredArgsConstructor;
 
-import org.springframework.hateoas.Link;
-import org.springframework.hateoas.Resource;
+import org.springframework.hateoas.ResourceAssembler;
+import org.springframework.hateoas.ResourceSupport;
 
 @RequiredArgsConstructor
-public class FromEntityToResource<T> {
+public class FromEntityToResource<T, R extends ResourceSupport> {
 
-    private final List<T> entities;
+    private final List<T>                 entities;
+    private final ResourceAssembler<T, R> assembler;
 
-    public List<Resource<T>> getResources() {
-        List<Resource<T>> resources = new ArrayList<>(entities.size());
+    public List<R> getResources() {
+        List<R> resources = new ArrayList<>(entities.size());
         for (T entity : entities)
-            resources.add(new Resource<T>(entity, getLinksTo(entity)));
+            resources.add(assembler.toResource(entity));
         return resources;
-    }
-
-    private Iterable<Link> getLinksTo(T entity) {
-        return Collections.<Link> emptyList();
     }
 
 }

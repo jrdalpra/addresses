@@ -2,22 +2,29 @@ package com.zeroturnaround.rebellabs.addresses.model;
 
 import java.io.Serializable;
 
+import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Getter
-@RequiredArgsConstructor
+@AllArgsConstructor
+@NoArgsConstructor
 @EqualsAndHashCode(of = "id")
 public class State implements Serializable {
-	private static final long serialVersionUID = 1L;
+    private final static long serialVersionUID = 1L;
 
-	private final Long id;
+    private Long              id;
 
-	private final String name;
+    private String            name;
 
-	private final String acronym;
+    private String            acronym;
 
-	private final Country country;
+    @Setter
+    @JsonIgnore
+    private Country           country;
 
 }

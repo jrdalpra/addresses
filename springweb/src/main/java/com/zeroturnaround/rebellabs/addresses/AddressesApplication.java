@@ -12,6 +12,8 @@ import org.springframework.stereotype.Service;
 
 import com.zeroturnaround.rebellabs.addresses.api.CountriesRepository;
 import com.zeroturnaround.rebellabs.addresses.api.InMemoryCountriesRepository;
+import com.zeroturnaround.rebellabs.addresses.api.InMemoryStateRepository;
+import com.zeroturnaround.rebellabs.addresses.api.StatesRepository;
 
 public class AddressesApplication extends SpringBootServletInitializer {
 
@@ -28,10 +30,17 @@ public class AddressesApplication extends SpringBootServletInitializer {
     @EnableAutoConfiguration
     @ComponentScan(excludeFilters = @Filter({ Service.class, Configuration.class }))
     static class AddressesConfiguration {
+
         @Bean
         public CountriesRepository countriesRepository() {
             return new InMemoryCountriesRepository();
         }
+
+        @Bean
+        public StatesRepository statesRepository() {
+            return new InMemoryStateRepository();
+        }
+
     }
 
 }

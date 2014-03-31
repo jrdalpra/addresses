@@ -2,8 +2,8 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
-		<groupId>com.zeroturnaround.rebellabs</groupId>
-		<artifactId>addresses</artifactId>
+		<groupId>com.zeroturnaround.rebellabs.addresses</groupId>
+		<artifactId>parent</artifactId>
 		<version>0.0.1-SNAPSHOT</version>
 	</parent>
 
@@ -13,12 +13,12 @@
 	<dependencies>
 		<!-- Ours -->
 		<dependency>
-			<groupId>com.zeroturnaround.rebellabs</groupId>
+			<groupId>${project.groupId}</groupId>
 			<artifactId>api</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>com.zeroturnaround.rebellabs</groupId>
+			<groupId>${project.groupId}</groupId>
 			<artifactId>api-inmemoryimpl</artifactId>
 			<version>${project.version}</version>
 		</dependency>
@@ -38,6 +38,11 @@
 			<groupId>org.springframework.hateoas</groupId>
 			<artifactId>spring-hateoas</artifactId>
 			<version>${version.spring-hateoas}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.plugin</groupId>
+			<artifactId>spring-plugin-core</artifactId>
+			<version>${version.spring-plugin-core}</version>
 		</dependency>
 
 		<dependency>

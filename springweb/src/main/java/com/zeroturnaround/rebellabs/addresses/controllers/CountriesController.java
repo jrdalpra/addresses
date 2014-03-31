@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.zeroturnaround.rebellabs.addresses.FromEntityToResource;
+import com.zeroturnaround.rebellabs.addresses.FromEntityListToResourceList;
 import com.zeroturnaround.rebellabs.addresses.api.CountriesRepository;
 import com.zeroturnaround.rebellabs.addresses.api.exceptions.NotFoundException;
 import com.zeroturnaround.rebellabs.addresses.model.Country;
@@ -38,7 +38,7 @@ public class CountriesController {
         public Resource<Country> toResource(Country entity) {
             return new Resource<Country>(entity,
                                          linkTo(methodOn(CountriesController.class).get(entity.getId())).withSelfRel(),
-                                         linkTo(methodOn(StatesController.class).list(entity, 0, 10)).withRel("states"));
+                                         linkTo(methodOn(StatesController.class).listByCountry(entity, 0, 10)).withRel("states"));
         }
     }
 
@@ -64,7 +64,7 @@ public class CountriesController {
     }
 
     private List<Resource<Country>> from(Integer page, Integer max) {
-        return new FromEntityToResource<Country, Resource<Country>>(countries.list(page.orWhenNull(0), max.orWhenNull(10)), new FromCountryToResource()).getResources();
+        return new FromEntityListToResourceList<Country, Resource<Country>>(countries.list(page.orWhenNull(0), max.orWhenNull(10)), new FromCountryToResource()).getResources();
     }
 
     @SuppressWarnings("rawtypes")

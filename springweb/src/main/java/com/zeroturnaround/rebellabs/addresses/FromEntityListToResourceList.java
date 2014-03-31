@@ -9,7 +9,7 @@ import org.springframework.hateoas.ResourceAssembler;
 import org.springframework.hateoas.ResourceSupport;
 
 @RequiredArgsConstructor
-public class FromEntityToResource<T, R extends ResourceSupport> {
+public class FromEntityListToResourceList<T, R extends ResourceSupport> {
 
     private final List<T>                 entities;
     private final ResourceAssembler<T, R> assembler;

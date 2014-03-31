@@ -8,6 +8,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.ComponentScan.Filter;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.hateoas.config.EnableHypermediaSupport;
+import org.springframework.hateoas.config.EnableHypermediaSupport.HypermediaType;
 import org.springframework.stereotype.Service;
 
 import com.zeroturnaround.rebellabs.addresses.api.CountriesRepository;
@@ -28,6 +30,7 @@ public class AddressesApplication extends SpringBootServletInitializer {
 
     @Configuration
     @EnableAutoConfiguration
+    @EnableHypermediaSupport(type = HypermediaType.HAL)
     @ComponentScan(excludeFilters = @Filter({ Service.class, Configuration.class }))
     static class AddressesConfiguration {
 

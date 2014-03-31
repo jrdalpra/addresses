@@ -1,8 +1,8 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>com.zeroturnaround.rebellabs</groupId>
-	<artifactId>addresses</artifactId>
+	<groupId>com.zeroturnaround.rebellabs.addresses</groupId>
+	<artifactId>parent</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
@@ -10,7 +10,8 @@
 		<version.java>1.7</version.java>
 		<version.spring>4.0.0.RELEASE</version.spring>
 		<version.lombok>1.12.2</version.lombok>
-		<version.spring-hateoas>0.8.0.RELEASE</version.spring-hateoas>
+		<version.spring-hateoas>0.9.0.RELEASE</version.spring-hateoas>
+		<version.spring-plugin-core>1.0.0.RELEASE</version.spring-plugin-core>
 		<version.spring-webmvc>4.0.0.RELEASE</version.spring-webmvc>
 		<version.jackson-mapper-asl>1.9.9</version.jackson-mapper-asl>
 		<version.jaxb-api>2.2.7</version.jaxb-api>

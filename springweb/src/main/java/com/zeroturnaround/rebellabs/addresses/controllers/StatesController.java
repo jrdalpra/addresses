@@ -4,7 +4,10 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 
+import java.util.List;
+
 import javax.inject.Inject;
+import javax.xml.bind.annotation.XmlRootElement;
 
 import lombok.Delegate;
 import lombok.NoArgsConstructor;
@@ -21,7 +24,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.zeroturnaround.rebellabs.addresses.FromEntityToResource;
+import com.zeroturnaround.rebellabs.addresses.FromEntityListToResourceList;
 import com.zeroturnaround.rebellabs.addresses.api.StatesRepository;
 import com.zeroturnaround.rebellabs.addresses.api.exceptions.NotFoundException;
 import com.zeroturnaround.rebellabs.addresses.model.Country;
@@ -34,6 +37,7 @@ import com.zeroturnaround.rebellabs.addresses.utils.Numbers;
 public class StatesController {
 
     @NoArgsConstructor
+    @XmlRootElement(name = "state")
     private static class StateResource extends ResourceSupport {
 
         private static interface ExcludesFromState {
@@ -65,27 +69,46 @@ public class StatesController {
 
     @SuppressWarnings("rawtypes")
     @RequestMapping(value = "/countries/{id}/states", method = GET)
-    public ResponseEntity list(@PathVariable("id") Country country,
-                               @RequestParam(value = "page", defaultValue = "0") final Integer page,
-                               @RequestParam(value = "max", defaultValue = "10") final Integer max) {
+    public ResponseEntity listByCountry(@PathVariable("id") Country country,
+                                        @RequestParam(value = "page", defaultValue = "0") final Integer page,
+                                        @RequestParam(value = "max", defaultValue = "10") final Integer max) {
         try {
-            return new ResponseEntity<>(new Resources<StateResource>(asResourcesFrom(country, page, max)), HttpStatus.OK);
+            return new ResponseEntity<>(resourcesFrom(states.listWhereCountryEquals(country, page, max)), HttpStatus.OK);
+        } catch (NotFoundException notFound) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         } catch (Exception e) {
             e.printStackTrace();
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    private Resources<StateResource> asResourcesFrom(Country country, final Integer page, final Integer max) {
-        return new Resources<>(new FromEntityToResource<>(states.listWhereCountryEquals(country, page, max), new FromStateToResource()).getResources());
+    private Resources<StateResource> resourcesFrom(List<State> list) {
+        return new Resources<>(new FromEntityListToResourceList<>(list, new FromStateToResource()).getResources());
+    }
+
+    @SuppressWarnings("rawtypes")
+    @RequestMapping(value = "/states", method = GET)
+    public ResponseEntity listByCountry(@RequestParam(value = "page", defaultValue = "0") final Integer page,
+                                        @RequestParam(value = "max", defaultValue = "10") final Integer max) {
+        try {
+            return new ResponseEntity<>(resourcesFrom(states.list(page, max)), HttpStatus.OK);
+        } catch (NotFoundException notFound) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @SuppressWarnings("rawtypes")
     @RequestMapping(value = "/states/{id}", method = GET)
     public ResponseEntity get(@PathVariable("id") Long id) {
         try {
-            return new ResponseEntity<>(states.get(id), HttpStatus.OK);
-        } catch (NotFoundException e) {
+            return new ResponseEntity<>(new StateResource(states.get(id)), HttpStatus.OK);
+        } catch (NotFoundException notFound) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            e.printStackTrace();
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }

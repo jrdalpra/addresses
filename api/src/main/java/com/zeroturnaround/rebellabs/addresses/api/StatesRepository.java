@@ -9,4 +9,6 @@ public interface StatesRepository extends CommonsMethodsForARepository<State, Lo
 
     List<State> listWhereCountryEquals(Country localized, int page, int max);
 
+    Integer lastPage(Country country, Integer max);
+
 }

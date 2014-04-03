@@ -1,5 +1,6 @@
 package com.zeroturnaround.rebellabs.addresses.controllers;
 
+import static java.util.Arrays.asList;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
@@ -7,13 +8,13 @@ import static org.springframework.web.bind.annotation.RequestMethod.GET;
 import java.util.List;
 
 import javax.inject.Inject;
-import javax.xml.bind.annotation.XmlRootElement;
 
 import lombok.Delegate;
 import lombok.NoArgsConstructor;
 import lombok.experimental.ExtensionMethod;
 
 import org.springframework.hateoas.ExposesResourceFor;
+import org.springframework.hateoas.Link;
 import org.springframework.hateoas.ResourceAssembler;
 import org.springframework.hateoas.ResourceSupport;
 import org.springframework.hateoas.Resources;
@@ -26,8 +27,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import com.zeroturnaround.rebellabs.addresses.FromEntityListToResourceList;
 import com.zeroturnaround.rebellabs.addresses.api.StatesRepository;
-import com.zeroturnaround.rebellabs.addresses.api.exceptions.NotFoundException;
 import com.zeroturnaround.rebellabs.addresses.model.Country;
+import com.zeroturnaround.rebellabs.addresses.model.Locale;
 import com.zeroturnaround.rebellabs.addresses.model.State;
 import com.zeroturnaround.rebellabs.addresses.utils.Numbers;
 
@@ -36,9 +37,7 @@ import com.zeroturnaround.rebellabs.addresses.utils.Numbers;
 @ExtensionMethod({ Numbers.class })
 public class StatesController {
 
-    @NoArgsConstructor
-    @XmlRootElement(name = "state")
-    private static class StateResource extends ResourceSupport {
+    public static class StateResource extends ResourceSupport {
 
         private static interface ExcludesFromState {
             Country getCountry();
@@ -51,13 +50,17 @@ public class StatesController {
 
         public StateResource(State state) {
             this.state = state;
-            add(linkTo(methodOn(StatesController.class).get(this.state.getId())).withSelfRel());
-            add(linkTo(methodOn(CountriesController.class).get(this.state.getCountry().getId())).withRel("country"));
+            add(linkTo(methodOn(StatesController.class).get(state)).withSelfRel());
+            add(linkTo(methodOn(CountriesController.class).get(state.getCountry())).withRel("country"));
+            add(linkTo(methodOn(LocalesController.class).listByStateAndType(state, Locale.Type.CITY, 0, 10)).withRel("cities"));
+            add(linkTo(methodOn(LocalesController.class).listByStateAndType(state, Locale.Type.DISTRICT, 0, 10)).withRel("districts"));
+            add(linkTo(methodOn(LocalesController.class).listByStateAndType(state, Locale.Type.VILLAGE, 0, 10)).withRel("villages"));
         }
 
     }
 
-    private static class FromStateToResource implements ResourceAssembler<State, StateResource> {
+    @NoArgsConstructor
+    private static class StateResourceAssembler implements ResourceAssembler<State, StateResource> {
         @Override
         public StateResource toResource(State entity) {
             return new StateResource(entity);
@@ -67,49 +70,46 @@ public class StatesController {
     @Inject
     private StatesRepository states;
 
-    @SuppressWarnings("rawtypes")
-    @RequestMapping(value = "/countries/{id}/states", method = GET)
-    public ResponseEntity listByCountry(@PathVariable("id") Country country,
-                                        @RequestParam(value = "page", defaultValue = "0") final Integer page,
-                                        @RequestParam(value = "max", defaultValue = "10") final Integer max) {
-        try {
-            return new ResponseEntity<>(resourcesFrom(states.listWhereCountryEquals(country, page, max)), HttpStatus.OK);
-        } catch (NotFoundException notFound) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
-
-    private Resources<StateResource> resourcesFrom(List<State> list) {
-        return new Resources<>(new FromEntityListToResourceList<>(list, new FromStateToResource()).getResources());
-    }
-
-    @SuppressWarnings("rawtypes")
-    @RequestMapping(value = "/states", method = GET)
-    public ResponseEntity listByCountry(@RequestParam(value = "page", defaultValue = "0") final Integer page,
-                                        @RequestParam(value = "max", defaultValue = "10") final Integer max) {
-        try {
-            return new ResponseEntity<>(resourcesFrom(states.list(page, max)), HttpStatus.OK);
-        } catch (NotFoundException notFound) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
-
-    @SuppressWarnings("rawtypes")
     @RequestMapping(value = "/states/{id}", method = GET)
-    public ResponseEntity get(@PathVariable("id") Long id) {
-        try {
-            return new ResponseEntity<>(new StateResource(states.get(id)), HttpStatus.OK);
-        } catch (NotFoundException notFound) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+    public ResponseEntity<StateResource> get(@PathVariable("id") State state) {
+        return new ResponseEntity<>(new StateResource(states.reload(state)), HttpStatus.OK);
     }
+
+    @RequestMapping(value = "/countries/{id}/states", method = GET)
+    public ResponseEntity<Resources<StateResource>> listByCountry(@PathVariable("id") Country country,
+                                                                  @RequestParam(value = "page", defaultValue = "0") final Integer page,
+                                                                  @RequestParam(value = "max", defaultValue = "10") final Integer max) {
+        return new ResponseEntity<>(new Resources<>(ofStatesFrom(country, page, max), withPageLinksBy(country, page, max)), HttpStatus.OK);
+    }
+
+    private Iterable<Link> withPageLinksBy(Country country, Integer page, Integer max) {
+        return asList(linkTo(methodOn(StatesController.class).listByCountry(country, 0, max)).withRel("first"),
+                      linkTo(methodOn(StatesController.class).listByCountry(country, page.orWhenNull(0) + 1, max)).withRel("next"),
+                      linkTo(methodOn(StatesController.class).listByCountry(country, states.lastPage(country, max), max)).withRel("last"));
+    }
+
+    private List<StateResource> ofStatesFrom(Country country, final Integer page, final Integer max) {
+        return listOfResourcesFrom(states.listWhereCountryEquals(country, page, max));
+    }
+
+    @RequestMapping(value = "/states", method = GET)
+    public ResponseEntity<Resources<StateResource>> list(@RequestParam(value = "page", defaultValue = "0") final Integer page,
+                                                         @RequestParam(value = "max", defaultValue = "10") final Integer max) {
+        return new ResponseEntity<>(new Resources<>(ofStates(page, max), withPageLinks(page, max)), HttpStatus.OK);
+    }
+
+    private List<StateResource> ofStates(final Integer page, final Integer max) {
+        return listOfResourcesFrom(states.list(page, max));
+    }
+
+    private Iterable<Link> withPageLinks(Integer page, Integer max) {
+        return asList(linkTo(methodOn(StatesController.class).list(0, max)).withRel("first"),
+                      linkTo(methodOn(StatesController.class).list(page.orWhenNull(0) + 1, max)).withRel("next"),
+                      linkTo(methodOn(StatesController.class).list(states.lastPage(max), max)).withRel("last"));
+    }
+
+    private List<StateResource> listOfResourcesFrom(List<State> listWhereCountryEquals) {
+        return new FromEntityListToResourceList<>(listWhereCountryEquals, new StateResourceAssembler()).getResources();
+    }
+
 }

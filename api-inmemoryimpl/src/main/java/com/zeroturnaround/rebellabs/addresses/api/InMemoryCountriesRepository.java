@@ -41,4 +41,11 @@ public class InMemoryCountriesRepository implements CountriesRepository {
         return 10;
     }
 
+    @Override
+    public Country reload(Country entity) throws NotFoundException {
+        if (entity == null || entity.getId() == null)
+            throw new NotFoundException();
+        return get(entity.getId());
+    }
+
 }

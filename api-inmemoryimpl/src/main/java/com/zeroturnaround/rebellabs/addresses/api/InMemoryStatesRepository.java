@@ -5,18 +5,25 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
+
 import com.zeroturnaround.rebellabs.addresses.api.exceptions.NotFoundException;
 import com.zeroturnaround.rebellabs.addresses.model.Country;
 import com.zeroturnaround.rebellabs.addresses.model.State;
 
-public class InMemoryStateRepository implements StatesRepository {
+public class InMemoryStatesRepository implements StatesRepository {
 
-    private Map<Long, State> states = new HashMap<Long, State>();
+    private Map<Long, State>    states = new HashMap<Long, State>();
 
-    {
-        states.put(1l, new State(1l, "Santa Catarina", "SC", new Country(1l, null, null)));
-        states.put(2l, new State(2l, "Sao Paulo", "SP", new Country(1l, null, null)));
-        states.put(3l, new State(3l, "New York", "NY", new Country(2l, null, null)));
+    @Inject
+    private CountriesRepository countries;
+
+    @PostConstruct
+    public void setup() {
+        states.put(1l, new State(1l, "Santa Catarina", "SC", countries.get(1l)));
+        states.put(2l, new State(2l, "Sao Paulo", "SP", countries.get(1l)));
+        states.put(3l, new State(3l, "New York", "NY", countries.get(2l)));
     }
 
     @Override
@@ -43,6 +50,19 @@ public class InMemoryStateRepository implements StatesRepository {
             if (state.getCountry().equals(localized))
                 fromCountry.add(state);
         return fromCountry;
+    }
+
+    @Override
+    public State reload(State entity) throws NotFoundException {
+        if (entity == null || entity.getId() == null)
+            throw new NotFoundException();
+        return get(entity.getId());
+    }
+
+    @Override
+    public Integer lastPage(Country country, Integer max) {
+        // TODO
+        return 10;
     }
 
 }

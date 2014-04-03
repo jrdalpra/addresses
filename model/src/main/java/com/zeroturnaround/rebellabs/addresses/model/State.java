@@ -6,9 +6,6 @@ import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Getter
 @AllArgsConstructor
@@ -23,8 +20,17 @@ public class State implements Serializable {
 
     private String            acronym;
 
-    @Setter
-    @JsonIgnore
     private Country           country;
 
+    public State(Long id) {
+        this.id = id;
+    }
+
+    public String toString() {
+        return id == null ? null : id.toString();
+    }
+
+    public static State valueOf(String value) {
+        return new State(Long.valueOf(value));
+    }
 }

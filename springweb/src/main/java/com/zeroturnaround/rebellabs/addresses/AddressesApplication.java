@@ -13,9 +13,15 @@ import org.springframework.stereotype.Service;
 import com.zeroturnaround.rebellabs.addresses.api.CountriesRepository;
 import com.zeroturnaround.rebellabs.addresses.api.InMemoryCountriesRepository;
 import com.zeroturnaround.rebellabs.addresses.api.InMemoryLocalesRepository;
+import com.zeroturnaround.rebellabs.addresses.api.InMemoryNeighborhoodsRepository;
 import com.zeroturnaround.rebellabs.addresses.api.InMemoryStatesRepository;
+import com.zeroturnaround.rebellabs.addresses.api.InMemoryTypesOfPublicPlacesRepository;
 import com.zeroturnaround.rebellabs.addresses.api.LocalesRepository;
+import com.zeroturnaround.rebellabs.addresses.api.NeighborhoodsRepository;
+import com.zeroturnaround.rebellabs.addresses.api.PublicPlacesRepository;
 import com.zeroturnaround.rebellabs.addresses.api.StatesRepository;
+import com.zeroturnaround.rebellabs.addresses.api.TypesOfPublicPlacesRepository;
+import com.zeroturnaround.rebellabs.addresses.controllers.InMemoryPublicPlacesRepository;
 
 public class AddressesApplication extends SpringBootServletInitializer {
 
@@ -46,6 +52,21 @@ public class AddressesApplication extends SpringBootServletInitializer {
         @Bean
         public LocalesRepository localesRepository() {
             return new InMemoryLocalesRepository();
+        }
+
+        @Bean
+        public TypesOfPublicPlacesRepository typesOfPublicPlacesRepository() {
+            return new InMemoryTypesOfPublicPlacesRepository();
+        }
+
+        @Bean
+        public NeighborhoodsRepository neighborhoodsRepository() {
+            return new InMemoryNeighborhoodsRepository();
+        }
+
+        @Bean
+        public PublicPlacesRepository publicPlacesRepository() {
+            return new InMemoryPublicPlacesRepository();
         }
 
     }

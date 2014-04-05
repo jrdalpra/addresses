@@ -9,6 +9,7 @@ import java.util.List;
 import javax.inject.Inject;
 
 import lombok.Delegate;
+import lombok.NoArgsConstructor;
 import lombok.experimental.ExtensionMethod;
 
 import org.springframework.hateoas.ExposesResourceFor;
@@ -34,6 +35,7 @@ import com.zeroturnaround.rebellabs.addresses.utils.Numbers;
 @ExtensionMethod({ Numbers.class })
 public class NeighborhoodsController {
 
+    @NoArgsConstructor
     public static class NeighborhoodResource extends ResourceSupport {
 
         private interface Excludes {
@@ -48,6 +50,7 @@ public class NeighborhoodsController {
         public NeighborhoodResource(Neighborhood entity) {
             this.entity = entity;
             add(linkTo(methodOn(NeighborhoodsController.class).get(entity)).withSelfRel());
+            add(linkTo(methodOn(LocalesController.class).get(entity.getLocale())).withRel("locale"));
         }
     }
 
@@ -69,14 +72,14 @@ public class NeighborhoodsController {
     @RequestMapping("/neighborhoods")
     public ResponseEntity<Resources<NeighborhoodResource>> list(@RequestParam(value = "page", defaultValue = "0") Integer page,
                                                                 @RequestParam(value = "max", defaultValue = "10") Integer max) {
-        return new ResponseEntity<>(new Resources<>(ofNeighborhoods(page, max), pageLinks(page, max)), HttpStatus.OK);
+        return new ResponseEntity<>(new Resources<>(ofNeighborhoods(page, max), withPageLinks(page, max)), HttpStatus.OK);
     }
 
     private List<NeighborhoodResource> ofNeighborhoods(Integer page, Integer max) {
         return listOfResourcesFrom(neighborhoods.list(page, max));
     }
 
-    private List<Link> pageLinks(Integer page, Integer max) {
+    private List<Link> withPageLinks(Integer page, Integer max) {
         return asList(linkTo(methodOn(NeighborhoodsController.class).list(0, max)).withRel("first"),
                       linkTo(methodOn(NeighborhoodsController.class).list(page.orWhenNull(0) + 1, max)).withRel("next"),
                       linkTo(methodOn(NeighborhoodsController.class).list(neighborhoods.lastPage(max), max)).withRel("last"));

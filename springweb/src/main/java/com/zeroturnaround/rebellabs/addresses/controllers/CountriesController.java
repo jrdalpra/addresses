@@ -50,7 +50,7 @@ public class CountriesController {
     }
 
     @NoArgsConstructor
-    private static class CountryResourceAssembler implements ResourceAssembler<Country, CountryResource> {
+    private static class CountryAssembler implements ResourceAssembler<Country, CountryResource> {
         @Override
         public CountryResource toResource(Country entity) {
             return new CountryResource(entity);
@@ -72,14 +72,17 @@ public class CountriesController {
     }
 
     private List<CountryResource> ofCountries(Integer page, Integer max) {
-        return new FromEntityListToResourceList<Country, CountryResource>(countries.list(page.orWhenNull(0), max.orWhenNull(10)),
-                                                                          new CountryResourceAssembler()).getResources();
+        return listOfResourcesFrom(countries.list(page.orWhenNull(0), max.orWhenNull(10)));
     }
 
     private List<Link> withPageLinks(Integer page, Integer max) {
         return asList(linkTo(methodOn(CountriesController.class).list(0, max)).withRel("first"),
                       linkTo(methodOn(CountriesController.class).list(page.orWhenNull(0) + 1, max)).withRel("next"),
                       linkTo(methodOn(CountriesController.class).list(countries.lastPage(max), max)).withRel("last"));
+    }
+
+    private List<CountryResource> listOfResourcesFrom(List<Country> list) {
+        return new FromEntityListToResourceList<Country, CountryResource>(list, new CountryAssembler()).getResources();
     }
 
 }

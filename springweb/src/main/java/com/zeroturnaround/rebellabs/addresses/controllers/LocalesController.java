@@ -53,6 +53,7 @@ public class LocalesController {
             add(linkTo(methodOn(LocalesController.class).get(entity)).withSelfRel());
             add(linkTo(methodOn(StatesController.class).get(entity.getState())).withRel("state"));
             add(linkTo(methodOn(NeighborhoodsController.class).listRelatedWith(entity, 0, 10)).withRel("neighborhoods"));
+            add(linkTo(methodOn(PublicPlacesController.class).listRelatedWith(entity, 0, 10)).withRel("publicplaces"));
         }
 
     }

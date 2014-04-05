@@ -79,7 +79,7 @@ public class PublicPlacesController {
     private PublicPlacesRepository publicPlaces;
 
     @RequestMapping("/publicplaces/{id}")
-    public ResponseEntity<PublicPlaceResource> get(PublicPlace publicPlace) {
+    public ResponseEntity<PublicPlaceResource> get(@PathVariable("id") PublicPlace publicPlace) {
         return new ResponseEntity<>(new PublicPlaceResource(publicPlaces.reload(publicPlace)), HttpStatus.OK);
     }
 
@@ -104,15 +104,15 @@ public class PublicPlacesController {
     public ResponseEntity<Resources<PublicPlaceResource>> listRelatedWith(@PathVariable("id") Locale locale,
                                                                           @RequestParam(value = "page", defaultValue = "0") final Integer page,
                                                                           @RequestParam(value = "max", defaultValue = "10") final Integer max) {
-        return new ResponseEntity<>(new Resources<>(ofPublicPlacesFrom(locale, page, max), withPageLinksFrom(locale, page, max)), HttpStatus.OK);
+        return new ResponseEntity<>(new Resources<>(ofPublicPlacesRelatedWith(locale, page, max), withPageLinksRelatedWith(locale, page, max)), HttpStatus.OK);
 
     }
 
-    private List<PublicPlaceResource> ofPublicPlacesFrom(Locale locale, Integer page, Integer max) {
+    private List<PublicPlaceResource> ofPublicPlacesRelatedWith(Locale locale, Integer page, Integer max) {
         return listOfResourcesFrom(publicPlaces.listRelatedWith(locale, page, max));
     }
 
-    private Iterable<Link> withPageLinksFrom(Locale locale, Integer page, Integer max) {
+    private Iterable<Link> withPageLinksRelatedWith(Locale locale, Integer page, Integer max) {
         return asList(linkTo(methodOn(PublicPlacesController.class).listRelatedWith(locale, 0, max)).withRel("first"),
                       linkTo(methodOn(PublicPlacesController.class).listRelatedWith(locale, page.orWhenNull(0) + 1, max)).withRel("next"),
                       linkTo(methodOn(PublicPlacesController.class).listRelatedWith(locale, publicPlaces.lastPageRelatedWith(locale, max), max)).withRel("last"));

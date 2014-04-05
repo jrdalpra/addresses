@@ -5,14 +5,44 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
+
+import com.zeroturnaround.rebellabs.addresses.api.LocalesRepository;
+import com.zeroturnaround.rebellabs.addresses.api.NeighborhoodsRepository;
 import com.zeroturnaround.rebellabs.addresses.api.PublicPlacesRepository;
+import com.zeroturnaround.rebellabs.addresses.api.TypesOfPublicPlacesRepository;
 import com.zeroturnaround.rebellabs.addresses.api.exceptions.NotFoundException;
 import com.zeroturnaround.rebellabs.addresses.model.Locale;
+import com.zeroturnaround.rebellabs.addresses.model.Neighborhood;
 import com.zeroturnaround.rebellabs.addresses.model.PublicPlace;
+import com.zeroturnaround.rebellabs.addresses.model.TypeOfPublicPlaces;
 
 public class InMemoryPublicPlacesRepository implements PublicPlacesRepository {
 
-    private Map<Long, PublicPlace> data = new HashMap<>();
+    private Map<Long, PublicPlace>        data = new HashMap<>();
+
+    @Inject
+    private LocalesRepository             locales;
+
+    @Inject
+    private NeighborhoodsRepository       neighborhoods;
+
+    @Inject
+    private TypesOfPublicPlacesRepository types;
+
+    @PostConstruct
+    public void setup() {
+        Long id = 0l;
+        for (Locale locale : locales.list(0, 99999)) {
+            for (Neighborhood neighborhood : neighborhoods.listRelatedWith(locale, 0, 99999)) {
+                for (TypeOfPublicPlaces type : types.list(0, 99999)) {
+                    id++;
+                    data.put(id, new PublicPlace(id, "Public Place " + id, type, locale, neighborhood));
+                }
+            }
+        }
+    }
 
     @Override
     public PublicPlace get(Long id) throws NotFoundException {

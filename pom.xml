@@ -16,6 +16,7 @@
 		<version.jackson-mapper-asl>1.9.9</version.jackson-mapper-asl>
 		<version.jaxb-api>2.2.7</version.jaxb-api>
 		<version.jackson-annotations>2.3.0</version.jackson-annotations>
+		<version.jersey>2.7</version.jersey>
 	</properties>
 
 	<build>

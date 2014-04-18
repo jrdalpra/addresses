@@ -1,4 +1,4 @@
-package com.zeroturnaround.rebellabs.addresses.controllers;
+package com.zeroturnaround.rebellabs.addresses.api;
 
 import java.util.ArrayList;
 import java.util.HashMap;

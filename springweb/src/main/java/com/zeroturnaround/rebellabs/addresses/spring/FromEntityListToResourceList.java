@@ -1,4 +1,4 @@
-package com.zeroturnaround.rebellabs.addresses;
+package com.zeroturnaround.rebellabs.addresses.spring;
 
 import java.util.ArrayList;
 import java.util.List;

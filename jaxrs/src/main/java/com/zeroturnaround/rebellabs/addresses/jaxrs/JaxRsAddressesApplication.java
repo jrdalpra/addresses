@@ -34,10 +34,10 @@ public class JaxRsAddressesApplication extends ResourceConfig {
 
         @SuppressWarnings("unchecked")
         private <T> T a_CDI_BeanOf(Class<T> type) {
-            BeanManager bm = CDI.current().getBeanManager();
-            Bean<T> bean = (Bean<T>) bm.getBeans(type).iterator().next();
-            CreationalContext<T> ctx = bm.createCreationalContext(bean);
-            return (T) bm.getReference(bean, type, ctx);
+            BeanManager manager = CDI.current().getBeanManager();
+            Bean<T> bean = (Bean<T>) manager.getBeans(type).iterator().next();
+            CreationalContext<T> ctx = manager.createCreationalContext(bean);
+            return (T) manager.getReference(bean, type, ctx);
         }
 
     }

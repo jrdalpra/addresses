@@ -1,4 +1,4 @@
-package com.zeroturnaround.rebellabs.addresses.infra;
+package com.zeroturnaround.rebellabs.addresses.spring.infra;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import com.zeroturnaround.rebellabs.addresses.api.exceptions.NotFoundException;
+
 
 @ControllerAdvice
 public class GlobalErrorsHandlers {

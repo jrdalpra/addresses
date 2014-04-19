@@ -1,4 +1,4 @@
-package com.zeroturnaround.rebellabs.addresses.controllers;
+package com.zeroturnaround.rebellabs.addresses.spring.controllers;
 
 import static java.util.Arrays.asList;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
@@ -25,11 +25,11 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.zeroturnaround.rebellabs.addresses.FromEntityListToResourceList;
 import com.zeroturnaround.rebellabs.addresses.api.StatesRepository;
 import com.zeroturnaround.rebellabs.addresses.model.Country;
 import com.zeroturnaround.rebellabs.addresses.model.Locale;
 import com.zeroturnaround.rebellabs.addresses.model.State;
+import com.zeroturnaround.rebellabs.addresses.spring.FromEntityListToResourceList;
 import com.zeroturnaround.rebellabs.addresses.utils.Numbers;
 
 @Controller

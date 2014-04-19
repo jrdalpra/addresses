@@ -23,6 +23,7 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
@@ -62,17 +63,15 @@ public class CountriesController {
         }
 
         private Link selfLink() {
-            return Link.fromUriBuilder(this.info.getBaseUriBuilder()
-                                                .path(CountriesController.class, "get"))
+            return Link.fromUriBuilder(info.getBaseUriBuilder().path(CountriesController.class, "get"))
                        .rel("self")
-                       .build(this.entity.getId());
+                       .build(entity.getId());
         }
 
         private Link statesLink() {
-            return Link.fromUriBuilder(this.info.getBaseUriBuilder()
-                                                .path(StatesController.class, "listByCountry"))
+            return Link.fromUriBuilder(info.getBaseUriBuilder().path(StatesController.class, "listByCountry"))
                        .rel("states")
-                       .build(this.entity.getId());
+                       .build(entity.getId());
         }
 
         @XmlElement(name = "link")
@@ -108,22 +107,28 @@ public class CountriesController {
         @XmlJavaTypeAdapter(Link.JaxbAdapter.class)
         private List<Link>            links;
 
-        public CountriesResources(List<Country> content,
+        @XmlTransient
+        private UriInfo               info;
+
+        public CountriesResources(List<Country> entities,
                                   UriInfo info,
                                   Link... links) {
-            this.links = Arrays.asList(links);
-            this.content = new ArrayList<>(content.size());
-            register(content, info);
+            this.info = info;
+            this.links = new ArrayList<>();
+            this.links.addAll(Arrays.asList(links));
+            this.content = new ArrayList<>(entities.size());
+            register(entities);
         }
 
-        private void register(List<Country> content, UriInfo info) {
-            for (Country country : content)
-                this.content.add(new CountryResource(country, info));
+        private void register(List<Country> entities) {
+            for (Country entity : entities)
+                content.add(new CountryResource(entity, info));
         }
+
     }
 
     @Inject
-    private CountriesRepository countries;
+    private CountriesRepository repository;
 
     @Context
     private UriInfo             info;
@@ -131,31 +136,30 @@ public class CountriesController {
     @GET
     @Path("countries/{id}")
     public Response get(@PathParam("id") Country country) {
-        return Response.ok(new CountryResource(countries.reload(country), info)).build();
+        return Response.ok(new CountryResource(repository.reload(country), info)).build();
     }
 
     @GET
     @Path("countries")
     public Response list(@QueryParam("page") @DefaultValue("0") Integer page,
                          @QueryParam("max") @DefaultValue("10") Integer max) {
-        return Response.ok(new CountriesResources(countries.list(page, max), info, pageLinks(page, max))).build();
+        return Response.ok(new CountriesResources(repository.list(page, max), info, pageLinks(page, max))).build();
     }
 
     private Link[] pageLinks(Integer page, Integer max) {
         return new Link[] {
-                listLinkTo("first", 0, max),
-                listLinkTo("next", page + 1, max),
-                listLinkTo("last", countries.lastPage(max), max)
+                linkToList("first", 0, max),
+                linkToList("next", page + 1, max),
+                linkToList("last", repository.lastPage(max), max)
         };
     }
 
-    private Link listLinkTo(String rel, Integer page, Integer max) {
+    private Link linkToList(String rel, Integer page, Integer max) {
         return Link.fromUriBuilder(toListMethod(page, max)).rel(rel).build();
     }
 
     private UriBuilder toListMethod(Integer page, Integer max) {
-        return info.getAbsolutePathBuilder()
-                   .path(CountriesController.class, "list")
+        return info.getAbsolutePathBuilder().path(CountriesController.class, "list")
                    .queryParam("page", page)
                    .queryParam("max", max);
     }

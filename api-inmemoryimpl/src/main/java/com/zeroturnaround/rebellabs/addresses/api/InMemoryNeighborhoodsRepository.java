@@ -1,5 +1,7 @@
 package com.zeroturnaround.rebellabs.addresses.api;
 
+import static java.lang.Math.min;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -45,7 +47,8 @@ public class InMemoryNeighborhoodsRepository implements NeighborhoodsRepository 
 
     @Override
     public List<Neighborhood> list(int page, int max) {
-        return new ArrayList<>(data.values());
+        List<Neighborhood> all = new ArrayList<>(data.values());
+        return all.subList(page, min(max, all.size() - 1));
     }
 
     @Override

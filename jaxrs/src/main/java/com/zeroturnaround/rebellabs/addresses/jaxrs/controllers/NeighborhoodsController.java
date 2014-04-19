@@ -27,51 +27,50 @@ import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.experimental.ExtensionMethod;
+import lombok.ToString;
 
-import com.zeroturnaround.rebellabs.addresses.api.CountriesRepository;
-import com.zeroturnaround.rebellabs.addresses.model.Country;
-import com.zeroturnaround.rebellabs.addresses.utils.Numbers;
+import com.zeroturnaround.rebellabs.addresses.api.NeighborhoodsRepository;
+import com.zeroturnaround.rebellabs.addresses.model.Locale;
+import com.zeroturnaround.rebellabs.addresses.model.Neighborhood;
 
 @Path("")
 @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
-@ExtensionMethod({ Numbers.class })
-public class CountriesController {
+public class NeighborhoodsController {
 
-    @XmlType(name = "country")
-    @XmlRootElement(name = "country")
+    @XmlType(name = "neighborhood")
+    @XmlRootElement(name = "neighborhood")
     @XmlAccessorType(XmlAccessType.PROPERTY)
     @NoArgsConstructor
-    public static class CountryResource {
+    @ToString
+    public static class NeighborhoodResource {
 
-        private Country    entity;
+        private Neighborhood entity;
 
-        private List<Link> links;
+        private List<Link>   links;
 
-        private UriInfo    info;
+        private UriInfo      info;
 
-        public CountryResource(Country entity,
-                               UriInfo info) {
+        public NeighborhoodResource(Neighborhood entity,
+                                    UriInfo info) {
             this.entity = entity;
             this.info = info;
             this.links = new ArrayList<>();
             this.links.add(linkToSelf());
-            this.links.add(linkToStates());
+            this.links.add(linkToState());
         }
 
         private Link linkToSelf() {
-            return Link.fromUriBuilder(info.getBaseUriBuilder().path(CountriesController.class, "get"))
+            return Link.fromUriBuilder(info.getBaseUriBuilder().path(NeighborhoodsController.class, "get"))
                        .rel("self")
                        .build(entity.getId());
         }
 
-        private Link linkToStates() {
-            return Link.fromUriBuilder(info.getBaseUriBuilder().path(StatesController.class, "listByCountry"))
-                       .rel("states")
-                       .build(entity.getId());
+        private Link linkToState() {
+            return Link.fromUriBuilder(info.getBaseUriBuilder().path(LocalesController.class, "get"))
+                       .rel("locale")
+                       .build(entity.getLocale().getId());
         }
 
         @XmlElement(name = "link")
@@ -82,37 +81,32 @@ public class CountriesController {
         }
 
         @XmlAttribute
-        public String getAcronym() {
-            return entity.getAcronym();
-        }
-
-        @XmlAttribute
         public String getName() {
             return entity.getName();
         }
+
     }
 
     @XmlType(name = "entities")
     @XmlRootElement(name = "entities")
     @XmlAccessorType(XmlAccessType.FIELD)
     @NoArgsConstructor
-    @AllArgsConstructor
     @Getter
-    public static class CountriesResources {
+    public static class NeighborhoodsResources {
 
-        @XmlElement(name = "country")
+        @XmlElement(name = "neighborhood")
         @XmlElementWrapper(name = "content")
-        private List<CountryResource> content;
+        private List<NeighborhoodResource> content;
 
         @XmlJavaTypeAdapter(Link.JaxbAdapter.class)
-        private List<Link>            links;
+        private List<Link>                 links;
 
         @XmlTransient
-        private UriInfo               info;
+        private UriInfo                    info;
 
-        public CountriesResources(List<Country> entities,
-                                  UriInfo info,
-                                  Link... links) {
+        public NeighborhoodsResources(List<Neighborhood> entities,
+                                      UriInfo info,
+                                      Link... links) {
             this.info = info;
             this.links = new ArrayList<>();
             this.links.addAll(Arrays.asList(links));
@@ -120,33 +114,33 @@ public class CountriesController {
             register(entities);
         }
 
-        private void register(List<Country> entities) {
-            for (Country entity : entities)
-                content.add(new CountryResource(entity, info));
+        private void register(List<Neighborhood> entities) {
+            for (Neighborhood entity : entities)
+                content.add(new NeighborhoodResource(entity, info));
         }
 
     }
 
     @Inject
-    private CountriesRepository repository;
+    private NeighborhoodsRepository repository;
 
     @Context
-    private UriInfo             info;
+    private UriInfo                 info;
 
     @GET
-    @Path("countries/{id}")
-    public Response get(@PathParam("id") Country country) {
-        return Response.ok(new CountryResource(repository.reload(country), info)).build();
+    @Path("neighborhoods/{id}")
+    public Response get(@PathParam("id") Neighborhood entity) {
+        return Response.ok(new NeighborhoodResource(repository.reload(entity), info)).build();
     }
 
     @GET
-    @Path("countries")
+    @Path("neighborhoods")
     public Response list(@QueryParam("page") @DefaultValue("0") Integer page,
                          @QueryParam("max") @DefaultValue("10") Integer max) {
-        return Response.ok(new CountriesResources(repository.list(page, max), info, pageLinks(page, max))).build();
+        return Response.ok(new NeighborhoodsResources(repository.list(page, max), info, pageLinks(page, max))).build();
     }
 
-    private Link[] pageLinks(Integer page, Integer max) {
+    public Link[] pageLinks(Integer page, Integer max) {
         return new Link[] {
                 linkToList("first", 0, max),
                 linkToList("next", page + 1, max),
@@ -159,9 +153,18 @@ public class CountriesController {
     }
 
     private UriBuilder toListMethod(Integer page, Integer max) {
-        return info.getAbsolutePathBuilder().path(CountriesController.class, "list")
+        return info.getBaseUriBuilder()
+                   .path(NeighborhoodsController.class, "list")
                    .queryParam("page", page)
                    .queryParam("max", max);
+    }
+
+    @GET
+    @Path("locales/{id}/neighborhoods")
+    public Response listRelatedWith(@PathParam("id") Locale locale,
+                                    @QueryParam("page") @DefaultValue("0") Integer page,
+                                    @QueryParam("max") @DefaultValue("10") Integer max) {
+        return Response.ok().build();
     }
 
 }

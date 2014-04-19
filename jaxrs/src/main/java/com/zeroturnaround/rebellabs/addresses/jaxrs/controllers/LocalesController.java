@@ -58,20 +58,42 @@ public class LocalesController {
             this.entity = entity;
             this.info = info;
             this.links = new ArrayList<>();
-            this.links.add(selfLink());
-            this.links.add(stateLink());
+            addLinks();
         }
 
-        private Link selfLink() {
+        private void addLinks() {
+            this.links.add(linkToSelf());
+            this.links.add(linkToState());
+            this.links.add(linkToNeighborhoods());
+            this.links.add(linkToPublicPlaces());
+        }
+
+        private Link linkToSelf() {
             return Link.fromUriBuilder(info.getBaseUriBuilder().path(LocalesController.class, "get"))
                        .rel("self")
                        .build(entity.getId());
         }
 
-        private Link stateLink() {
+        private Link linkToState() {
             return Link.fromUriBuilder(info.getBaseUriBuilder().path(StatesController.class, "get"))
                        .rel("state")
                        .build(entity.getState().getId());
+        }
+
+        private Link linkToNeighborhoods() {
+            return Link.fromUriBuilder(info.getBaseUriBuilder().path(NeighborhoodsController.class, "listRelatedWith")
+                                           .queryParam("page", 0)
+                                           .queryParam("max", 10))
+                       .rel("neighbordhoods")
+                       .build(entity.getId(), 0, 10);
+        }
+
+        private Link linkToPublicPlaces() {
+            return Link.fromUriBuilder(info.getBaseUriBuilder().path(PublicPlacesController.class, "listRelatedWith")
+                                           .queryParam("page", 0)
+                                           .queryParam("max", 10))
+                       .rel("publicplaces")
+                       .build(entity.getId(), 0, 10);
         }
 
         @XmlElement(name = "link")

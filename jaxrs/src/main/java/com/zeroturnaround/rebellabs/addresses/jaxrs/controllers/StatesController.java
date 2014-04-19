@@ -62,18 +62,18 @@ public class StatesController {
         }
 
         private void addLinks() {
-            links.add(selfLink());
-            links.add(countryLink());
+            links.add(linkToSelf());
+            links.add(linkToCountry());
             addLocalesLinks();
         }
 
-        private Link selfLink() {
+        private Link linkToSelf() {
             return Link.fromUriBuilder(info.getBaseUriBuilder().path(StatesController.class, "get"))
                        .rel("self")
                        .build(entity.getId());
         }
 
-        private Link countryLink() {
+        private Link linkToCountry() {
             return Link.fromUriBuilder(info.getBaseUriBuilder().path(CountriesController.class, "get"))
                        .rel("country")
                        .build(entity.getCountry().getId());

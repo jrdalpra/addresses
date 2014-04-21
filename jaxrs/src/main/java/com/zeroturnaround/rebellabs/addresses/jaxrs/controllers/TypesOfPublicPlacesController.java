@@ -31,29 +31,29 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
-import com.zeroturnaround.rebellabs.addresses.api.PublicPlacesRepository;
+import com.zeroturnaround.rebellabs.addresses.api.TypesOfPublicPlacesRepository;
 import com.zeroturnaround.rebellabs.addresses.model.Locale;
-import com.zeroturnaround.rebellabs.addresses.model.PublicPlace;
+import com.zeroturnaround.rebellabs.addresses.model.TypeOfPublicPlaces;
 
 @Path("")
 @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
-public class PublicPlacesController {
+public class TypesOfPublicPlacesController {
 
-    @XmlType(name = "publicplace")
-    @XmlRootElement(name = "publicplace")
+    @XmlType(name = "typeofpublicplace")
+    @XmlRootElement(name = "typeofpublicplace")
     @XmlAccessorType(XmlAccessType.PROPERTY)
     @NoArgsConstructor
     @ToString
-    public static class PublicPlaceResource {
+    public static class TypeOfPublicPlacesResource {
 
-        private PublicPlace entity;
+        private TypeOfPublicPlaces entity;
 
-        private List<Link>  links;
+        private List<Link>         links;
 
-        private UriInfo     info;
+        private UriInfo            info;
 
-        public PublicPlaceResource(PublicPlace entity,
-                                   UriInfo info) {
+        public TypeOfPublicPlacesResource(TypeOfPublicPlaces entity,
+                                          UriInfo info) {
             this.entity = entity;
             this.info = info;
             this.links = new ArrayList<>();
@@ -62,34 +62,12 @@ public class PublicPlacesController {
 
         private void addLinks() {
             this.links.add(linkToSelf());
-            this.links.add(linkToState());
-            this.links.add(linkToNeighborhood());
-            this.links.add(linkToType());
-
         }
 
         private Link linkToSelf() {
-            return Link.fromUriBuilder(info.getBaseUriBuilder().path(PublicPlacesController.class, "get"))
+            return Link.fromUriBuilder(info.getBaseUriBuilder().path(TypesOfPublicPlacesController.class, "get"))
                        .rel("self")
                        .build(entity.getId());
-        }
-
-        private Link linkToState() {
-            return Link.fromUriBuilder(info.getBaseUriBuilder().path(LocalesController.class, "get"))
-                       .rel("locale")
-                       .build(entity.getLocale().getId());
-        }
-
-        private Link linkToNeighborhood() {
-            return Link.fromUriBuilder(info.getBaseUriBuilder().path(NeighborhoodsController.class, "get"))
-                       .rel("neighborhood")
-                       .build(entity.getLocale().getId());
-        }
-
-        private Link linkToType() {
-            return Link.fromUriBuilder(info.getBaseUriBuilder().path(TypesOfPublicPlacesController.class, "get"))
-                       .rel("type")
-                       .build(entity.getType().getId());
         }
 
         @XmlElement(name = "link")
@@ -111,21 +89,21 @@ public class PublicPlacesController {
     @XmlAccessorType(XmlAccessType.FIELD)
     @NoArgsConstructor
     @Getter
-    public static class PublicPlacesResources {
+    public static class TypeOfPublicPlacessResources {
 
-        @XmlElement(name = "publicplace")
+        @XmlElement(name = "typeofpublicplace")
         @XmlElementWrapper(name = "content")
-        private List<PublicPlaceResource> content;
+        private List<TypeOfPublicPlacesResource> content;
 
         @XmlJavaTypeAdapter(Link.JaxbAdapter.class)
-        private List<Link>                links;
+        private List<Link>                       links;
 
         @XmlTransient
-        private UriInfo                   info;
+        private UriInfo                          info;
 
-        public PublicPlacesResources(List<PublicPlace> entities,
-                                     UriInfo info,
-                                     Link... links) {
+        public TypeOfPublicPlacessResources(List<TypeOfPublicPlaces> entities,
+                                            UriInfo info,
+                                            Link... links) {
             this.info = info;
             this.links = new ArrayList<>();
             this.links.addAll(Arrays.asList(links));
@@ -133,30 +111,30 @@ public class PublicPlacesController {
             register(entities);
         }
 
-        private void register(List<PublicPlace> entities) {
-            for (PublicPlace entity : entities)
-                content.add(new PublicPlaceResource(entity, info));
+        private void register(List<TypeOfPublicPlaces> entities) {
+            for (TypeOfPublicPlaces entity : entities)
+                content.add(new TypeOfPublicPlacesResource(entity, info));
         }
 
     }
 
     @Inject
-    private PublicPlacesRepository repository;
+    private TypesOfPublicPlacesRepository repository;
 
     @Context
-    private UriInfo                info;
+    private UriInfo                       info;
 
     @GET
-    @Path("publicplaces/{id}")
-    public Response get(@PathParam("id") PublicPlace entity) {
-        return Response.ok(new PublicPlaceResource(repository.reload(entity), info)).build();
+    @Path("typesofpublicplaces/{id}")
+    public Response get(@PathParam("id") TypeOfPublicPlaces entity) {
+        return Response.ok(new TypeOfPublicPlacesResource(repository.reload(entity), info)).build();
     }
 
     @GET
-    @Path("publicplaces")
+    @Path("typesofpublicplaces")
     public Response list(@QueryParam("page") @DefaultValue("0") Integer page,
                          @QueryParam("max") @DefaultValue("10") Integer max) {
-        return Response.ok(new PublicPlacesResources(repository.list(page, max), info, pageLinks(page, max))).build();
+        return Response.ok(new TypeOfPublicPlacessResources(repository.list(page, max), info, pageLinks(page, max))).build();
     }
 
     public Link[] pageLinks(Integer page, Integer max) {
@@ -173,36 +151,17 @@ public class PublicPlacesController {
 
     private UriBuilder toListMethod(Integer page, Integer max) {
         return info.getBaseUriBuilder()
-                   .path(PublicPlacesController.class, "list")
+                   .path(TypesOfPublicPlacesController.class, "list")
                    .queryParam("page", page)
                    .queryParam("max", max);
     }
 
     @GET
-    @Path("locales/{id}/publicplaces")
+    @Path("locales/{id}/typesofpublicplaces")
     public Response listRelatedWith(@PathParam("id") Locale locale,
                                     @QueryParam("page") @DefaultValue("0") Integer page,
                                     @QueryParam("max") @DefaultValue("10") Integer max) {
-        return Response.ok(new PublicPlacesResources(repository.listRelatedWith(locale, page, max), info, pageLinks(locale, page, max))).build();
-    }
-
-    private Link[] pageLinks(Locale locale, Integer page, Integer max) {
-        return new Link[] {
-                linkToListRelatedWith(locale, "self", page, max),
-                linkToListRelatedWith(locale, "next", page + 1, max),
-                linkToListRelatedWith(locale, "last", repository.lastPageRelatedWith(locale, max), max),
-        };
-    }
-
-    private Link linkToListRelatedWith(Locale locale, String rel, Integer page, Integer max) {
-        return Link.fromUriBuilder(toListRelatedWith(page, max)).rel(rel).build(locale.getId());
-    }
-
-    private UriBuilder toListRelatedWith(Integer page, Integer max) {
-        return info.getBaseUriBuilder()
-                   .path(PublicPlacesController.class, "listRelatedWith")
-                   .queryParam("page", page)
-                   .queryParam("max", max);
+        return Response.ok().build();
     }
 
 }

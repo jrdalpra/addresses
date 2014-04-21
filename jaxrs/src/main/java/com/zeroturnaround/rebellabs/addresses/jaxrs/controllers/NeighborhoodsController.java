@@ -58,7 +58,7 @@ public class NeighborhoodsController {
             this.info = info;
             this.links = new ArrayList<>();
             this.links.add(linkToSelf());
-            this.links.add(linkToState());
+            this.links.add(linkToLocale());
         }
 
         private Link linkToSelf() {
@@ -67,7 +67,7 @@ public class NeighborhoodsController {
                        .build(entity.getId());
         }
 
-        private Link linkToState() {
+        private Link linkToLocale() {
             return Link.fromUriBuilder(info.getBaseUriBuilder().path(LocalesController.class, "get"))
                        .rel("locale")
                        .build(entity.getLocale().getId());
@@ -164,7 +164,26 @@ public class NeighborhoodsController {
     public Response listRelatedWith(@PathParam("id") Locale locale,
                                     @QueryParam("page") @DefaultValue("0") Integer page,
                                     @QueryParam("max") @DefaultValue("10") Integer max) {
-        return Response.ok().build();
+        return Response.ok(new NeighborhoodsResources(repository.listRelatedWith(locale, page, max), info, pageLinks(locale, page, max))).build();
+    }
+
+    private Link[] pageLinks(Locale locale, Integer page, Integer max) {
+        return new Link[] {
+                linkToListRelatedWith(locale, "self", page, max),
+                linkToListRelatedWith(locale, "next", page + 1, max),
+                linkToListRelatedWith(locale, "last", repository.lastPageRelatedWith(locale, max), max),
+        };
+    }
+
+    private Link linkToListRelatedWith(Locale locale, String rel, Integer page, Integer max) {
+        return Link.fromUriBuilder(toListRelatedWith(page, max)).rel(rel).build(locale.getId());
+    }
+
+    private UriBuilder toListRelatedWith(Integer page, Integer max) {
+        return info.getBaseUriBuilder()
+                   .path(NeighborhoodsController.class, "listRelatedWith")
+                   .queryParam("page", page)
+                   .queryParam("max", max);
     }
 
 }

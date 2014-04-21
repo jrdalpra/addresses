@@ -1,5 +1,7 @@
 package com.zeroturnaround.rebellabs.addresses.api;
 
+import static java.lang.Math.min;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -8,10 +10,6 @@ import java.util.Map;
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 
-import com.zeroturnaround.rebellabs.addresses.api.LocalesRepository;
-import com.zeroturnaround.rebellabs.addresses.api.NeighborhoodsRepository;
-import com.zeroturnaround.rebellabs.addresses.api.PublicPlacesRepository;
-import com.zeroturnaround.rebellabs.addresses.api.TypesOfPublicPlacesRepository;
 import com.zeroturnaround.rebellabs.addresses.api.exceptions.NotFoundException;
 import com.zeroturnaround.rebellabs.addresses.model.Locale;
 import com.zeroturnaround.rebellabs.addresses.model.Neighborhood;
@@ -60,7 +58,8 @@ public class InMemoryPublicPlacesRepository implements PublicPlacesRepository {
 
     @Override
     public List<PublicPlace> list(int page, int max) {
-        return new ArrayList<>(data.values());
+        ArrayList<PublicPlace> all = new ArrayList<>(data.values());
+        return all.subList(page, min(max, all.size() - 1));
     }
 
     @Override

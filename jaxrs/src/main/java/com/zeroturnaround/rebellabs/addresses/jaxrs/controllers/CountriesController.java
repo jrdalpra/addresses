@@ -159,7 +159,7 @@ public class CountriesController {
     }
 
     private UriBuilder toListMethod(Integer page, Integer max) {
-        return info.getAbsolutePathBuilder().path(CountriesController.class, "list")
+        return info.getBaseUriBuilder().path(CountriesController.class, "list")
                    .queryParam("page", page)
                    .queryParam("max", max);
     }

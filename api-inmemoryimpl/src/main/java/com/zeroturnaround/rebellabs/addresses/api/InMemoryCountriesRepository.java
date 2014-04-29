@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import javax.annotation.PostConstruct;
+
 import com.zeroturnaround.rebellabs.addresses.api.exceptions.NotFoundException;
 import com.zeroturnaround.rebellabs.addresses.model.Country;
 
@@ -13,7 +15,8 @@ public class InMemoryCountriesRepository implements CountriesRepository {
 
     public final Map<Long, Country> data = new HashMap<>();
 
-    {
+    @PostConstruct
+    public void setup() {
         data.put(1l, new Country(1l, "Brasil", "BR"));
         data.put(2l, new Country(2l, "United States of America", "USA"));
     }

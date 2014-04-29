@@ -23,6 +23,7 @@ public class NotFoundInterceptor implements Interceptor {
         try {
             stack.next(method, resourceInstance);
         } catch (ApplicationLogicException error) {
+            error.printStackTrace();
             if (error.getCause() instanceof NotFoundException) {
                 result.notFound();
                 return;

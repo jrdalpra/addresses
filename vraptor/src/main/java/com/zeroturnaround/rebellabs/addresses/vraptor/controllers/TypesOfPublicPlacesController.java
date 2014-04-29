@@ -20,30 +20,24 @@ import br.com.caelum.vraptor.restfulie.serialization.XStreamSerialize;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamOmitField;
-import com.zeroturnaround.rebellabs.addresses.api.CountriesRepository;
-import com.zeroturnaround.rebellabs.addresses.model.Country;
+import com.zeroturnaround.rebellabs.addresses.api.TypesOfPublicPlacesRepository;
+import com.zeroturnaround.rebellabs.addresses.model.TypeOfPublicPlaces;
 import com.zeroturnaround.rebellabs.addresses.utils.Numbers;
 
 @Resource
 @ExtensionMethod({ Numbers.class })
-public class CountriesController {
+public class TypesOfPublicPlacesController {
 
-    @XStreamAlias("country")
+    @XStreamAlias("typeofpublicplace")
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class CountryResource implements HypermediaResource {
+    public static class TypeOfPublicPlacesResource implements HypermediaResource {
 
-        private Country entity;
+        private TypeOfPublicPlaces entity;
 
         @Override
         public void configureRelations(RelationBuilder builder) {
-            builder.relation("self").uses(CountriesController.class).get(entity);
-            builder.relation("states").uses(StatesController.class).listByCountry(entity, 0, 10);
-        }
-
-        @XStreamSerialize
-        public String getAcronym() {
-            return entity.getAcronym();
+            builder.relation("self").uses(TypesOfPublicPlacesController.class).get(entity);
         }
 
         @XStreamSerialize
@@ -55,32 +49,32 @@ public class CountriesController {
 
     @XStreamAlias("entities")
     @NoArgsConstructor
-    public static class CountriesResources implements HypermediaResource {
+    public static class TypesOfPublicPlacesResources implements HypermediaResource {
 
         @XStreamOmitField
-        private List<Country>         entities;
+        private List<TypeOfPublicPlaces>         entities;
 
         @XStreamOmitField
-        private Integer               page;
+        private Integer                          page;
 
         @XStreamOmitField
-        private Integer               max;
+        private Integer                          max;
 
-        private List<CountryResource> resources;
+        private List<TypeOfPublicPlacesResource> resources;
 
-        private BuildRelations        relations;
+        private BuildRelations                   relations;
 
-        public CountriesResources(List<Country> entities,
-                                  BuildRelations relations) {
+        public TypesOfPublicPlacesResources(List<TypeOfPublicPlaces> entities,
+                                            BuildRelations relations) {
             this.entities = entities;
             this.relations = relations;
             convert(entities);
         }
 
-        private void convert(List<Country> entities) {
+        private void convert(List<TypeOfPublicPlaces> entities) {
             this.resources = new ArrayList<>(entities == null ? 0 : entities.size());
-            for (Country entity : entities)
-                this.resources.add(new CountryResource(entity));
+            for (TypeOfPublicPlaces entity : entities)
+                this.resources.add(new TypeOfPublicPlacesResource(entity));
         }
 
         @Override
@@ -90,30 +84,30 @@ public class CountriesController {
         }
 
         @XStreamSerialize
-        public List<CountryResource> getResources() {
+        public List<TypeOfPublicPlacesResource> getResources() {
             return resources;
         }
 
     }
 
     @Inject
-    private Result              result;
+    private Result                        result;
 
     @Inject
-    private CountriesRepository repository;
+    private TypesOfPublicPlacesRepository repository;
 
     @Get
-    @Path("/countries/{entity.id}")
-    public void get(Country entity) {
-        result.use(representation()).from(new CountryResource(repository.reload(entity))).serialize();
+    @Path("/typesofpublicplaces/{entity.id}")
+    public void get(TypeOfPublicPlaces entity) {
+        result.use(representation()).from(new TypeOfPublicPlacesResource(repository.reload(entity))).serialize();
     }
 
     @Get
-    @Path({ "/countries?page={page}&max={max}", "/countries" })
+    @Path({ "/typesofpublicplaces?page={page}&max={max}", "/typesofpublicplaces" })
     public void list(Integer page, Integer max) {
         page = page.orWhenNull(0);
         max = max.orWhenNull(10);
-        result.use(representation()).from(new CountriesResources(repository.list(page, max), pageLinks(page, max))).serialize();
+        result.use(representation()).from(new TypesOfPublicPlacesResources(repository.list(page, max), pageLinks(page, max))).serialize();
     }
 
     private BuildRelations pageLinks(final Integer page, final Integer max) {
@@ -121,9 +115,9 @@ public class CountriesController {
 
             @Override
             public void buildUsingThe(RelationBuilder builder) {
-                builder.relation("self").uses(CountriesController.class).list(page, max);
-                builder.relation("next").uses(CountriesController.class).list(page + 1, max);
-                builder.relation("last").uses(CountriesController.class).list(repository.lastPage(max), max);
+                builder.relation("self").uses(TypesOfPublicPlacesController.class).list(page, max);
+                builder.relation("next").uses(TypesOfPublicPlacesController.class).list(page + 1, max);
+                builder.relation("last").uses(TypesOfPublicPlacesController.class).list(repository.lastPage(max), max);
             }
         };
     }

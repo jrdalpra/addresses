@@ -105,7 +105,6 @@
 		<module>api</module>
 		<module>springweb</module>
 		<module>vraptor</module>
-		<module>impl</module>
 		<module>jaxrs</module>
 		<module>api-inmemoryimpl</module>
 	</modules>
